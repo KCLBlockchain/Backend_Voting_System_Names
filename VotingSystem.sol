@@ -2,13 +2,13 @@ pragma solidity ^0.4.20;
 
 contract VotingSystem {
     
-    // This sctructure holds info about the person who votes
+    // This struct holds info about the person who votes
     struct Voter {
         bool voted;
         bytes32 vote;
     }
     
-    // This sctructure holds info about the person who you can vote for
+    // This struct holds info about the person who you can vote for
     struct Candidate {
         bytes32 name;
         uint8 numberOfVotes;
@@ -17,49 +17,38 @@ contract VotingSystem {
     // Contract owner's address
     address contractOwner;
     
-    
     // Mapping adresse's to voter info
     mapping(address => Voter) voters;
     Candidate[] candidates;
     
-    // Our constructor assigns names of candidates to the Candidate 
-    // array we stor on block chain.
-    // Also stors the contractOwner address on the block chain
+    // The constructor assigns names of candidates to the Candidate array we store on blockchain.
+    // Also stores the contractOwner address on the blockchain.  
     function VotingSystem (bytes32[] candidateNames) {
         contractOwner = msg.sender;
-        
         for (uint8 i = 0; i < candidateNames.length; i++) {
             candidates.push(Candidate({
                 name : candidateNames[i],
                 numberOfVotes : 0
             }));
-        }
-        
+        } 
     }
     
     // Voting function:
-    // Check wheter the voter has voted, if not:
-    // Mark the fact that he voted, also store the person he voted for
-    // Finally increment candidate's numberOfVotes
-    function vote (bytes32 voteFor) {
-        
-        Voter storage sender = voters[msg.sender];
-        
-        if(sender.voted) return;
-        
+    // Check whether the voter has voted, if not:
+    // - Mark the fact that he voted, also stores the person he voted for
+    // - Increment candidate's numberOfVotes
+    function vote (bytes32 voteFor) {  
+    
+        Voter storage sender = voters[msg.sender];  
+        if(sender.voted) return;      
         sender.voted = true;
         sender.vote = voteFor;
         
         for (uint i = 0; i < candidates.length; i++) {
-            
-             if (candidates[i].name == voteFor) {  
-              
-                candidates[i].numberOfVotes+=1;
-                 
-             }
-            
-        }
-        
+             if (candidates[i].name == voteFor) {         
+                candidates[i].numberOfVotes+=1;   
+             }          
+        }      
     }
 
 
@@ -69,23 +58,18 @@ contract VotingSystem {
         uint8 tempWinnerName;
         uint maxVote = 0;
         
-        for (uint8 i = 0; i < candidates.length; i++) {
-            
-            if (candidates[i].numberOfVotes >= maxVote) {
-                
+        for (uint8 i = 0; i < candidates.length; i++) {     
+            if (candidates[i].numberOfVotes >= maxVote) {            
                 maxVote = candidates[i].numberOfVotes;
                 tempWinnerName = i;
-                
             }
-
         }
         
         bytes32 winner = candidates[tempWinnerName].name;
         return bytes32ToString(winner);
-        
-
     }
     
+    // Convert bytes32 to string (used to display the winner's name)
     function bytes32ToString(bytes32 x) constant returns (string) {
     
         bytes memory bytesString = new bytes(32);
